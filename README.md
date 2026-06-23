@@ -1,16 +1,41 @@
-# React + Vite
+# 🚀 WORKFLOW - Streamline Attendance. Empower Productivity.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern full-stack Employee Attendance Management System built with **React, Node.js, Express, PostgreSQL, Prisma, Tailwind CSS, and Chart.js**.
 
-Currently, two official plugins are available:
+The system helps organizations manage attendance, employee records, leave requests, office geofencing, and workforce analytics through a secure and responsive dashboard.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 🔐 Authentication & Authorization
 
-## Expanding the ESLint configuration
+- JWT Authentication
+- Role-Based Access Control
+- Admin & Employee Roles
+- Protected Routes
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`]( https://typescript-eslint.io) in your project.
+### 👨‍💼 Employee Features
+
+- Clock In / Clock Out
+- Attendance History
+- Weekly Attendance Analytics
+- Apply Leave Requests
+- Track Leave Status
+- Edit Personal Profile
+- Dark / Light Mode Support
+
+### 👨‍💻 Admin Features
+
+- Admin Dashboard
+- Employee Directory
+- Add Employees
+- Edit Employee Details
+- Leave Approval & Rejection
+- Office Geofence Management
+- Department Analytics
+- Workforce Insights
+
+### 📊 Analytics
+
+- Department Distribution Charts
