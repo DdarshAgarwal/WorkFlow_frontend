@@ -1,6 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import api from "../services/api";
+import logo from "../assets/logo.svg";
 
 function Login() {
 
@@ -43,7 +44,7 @@ function Login() {
         <div className="relative z-10 flex flex-col justify-center px-20">
           <div className="mb-12 flex items-center gap-4">
             <div className="w-20 h-20 lg:w-28 lg:h-28 rounded-3xl overflow-hidden shadow-2xl ring-1 ring-white/20">
-              <img src="/src/assets/logo.svg" alt="WORKFLOW" className="w-full h-full" />
+              <img src={logo} alt="WORKFLOW" className="w-full h-full" />
             </div>
             <div>
               <h1 className="text-4xl font-bold text-white leading-tight">WORKFLOW</h1>
