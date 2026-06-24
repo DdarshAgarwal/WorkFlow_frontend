@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { Link } from "react-router-dom";
+import logo from "../assets/logo.svg";
 
 function Sidebar({
   collapsed,
@@ -59,7 +60,7 @@ function Sidebar({
       {/* LOGO */}
       <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex items-center justify-center">
         <div className="flex items-center gap-3">
-          <img src="/src/assets/logo.svg" alt="WORKFLOW" className="w-12 h-12" />
+          <img src={logo} alt="WORKFLOW" className="w-12 h-12" />
           <div>
             <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">WORKFLOW</h1>
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Streamline Attendance. Empower Productivity.</p>
@@ -132,14 +133,14 @@ function Sidebar({
 
           <div className="flex items-center justify-center p-2">
             <div className="w-14 h-14 rounded-lg overflow-hidden shadow-lg bg-white/5 dark:bg-slate-800 flex items-center justify-center ring-1 ring-white/10">
-              <img src="/src/assets/logo.svg" alt="WORKFLOW" className="w-12 h-12" />
+              <img src={logo} alt="WORKFLOW" className="w-12 h-12" />
             </div>
           </div>
 
         ) : (
 
           <div className="flex items-center gap-3">
-            <img src="/src/assets/logo.svg" alt="WORKFLOW" className="w-10 h-10" />
+            <img src={logo} alt="WORKFLOW" className="w-10 h-10" />
             <div>
               <h1 className="text-2xl font-bold text-slate-900 dark:text-white tracking-tight">WORKFLOW</h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Streamline Attendance</p>
