@@ -12,10 +12,10 @@ import {
 import { Line } from "react-chartjs-2";
 
 ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
+   CategoryScale,
+   LinearScale,
+   PointElement,
+   LineElement,
   Tooltip,
   Legend
 );
