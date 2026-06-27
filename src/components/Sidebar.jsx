@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   Users,
   Calendar,
+  Clock3,
   LogOut,
   UserPlus,
   Shield,
@@ -75,6 +76,14 @@ function Sidebar({
           Dashboard
         </Link>
         <Link to="/leave" className={menuClass} onClick={() => setCollapsed && setCollapsed(false)}>
+        <Link
+  to="/late"
+  className={menuClass}
+  onClick={() => setCollapsed && setCollapsed(false)}
+>
+  <Clock3 size={20} />
+  Late History
+</Link>
           <Calendar size={20} />
           Leave
         </Link>
@@ -181,6 +190,14 @@ function Sidebar({
           className={menuClass}
           onClick={() => setCollapsed && setCollapsed(false)}
         >
+          <Link
+  to="/late"
+  className={menuClass}
+  onClick={() => setCollapsed && setCollapsed(false)}
+>
+  <Clock3 size={20} />
+  Late History
+</Link>
 
           <Calendar
             size={20}

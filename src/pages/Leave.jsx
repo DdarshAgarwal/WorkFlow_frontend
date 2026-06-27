@@ -37,6 +37,8 @@ function Leave() {
     fetchLeaves();
   }, []);
 
+  const today = new Date().toISOString().split("T")[0];
+
   const fetchLeaves =
     async () => {
 
@@ -76,6 +78,15 @@ function Leave() {
 
       if (!reason.trim()) {
         toast.error("Please enter reason");
+        return;
+      }
+
+      const todayDate = new Date();
+      todayDate.setHours(0,0,0,0);
+      const selectedStart = new Date(startDate);
+      selectedStart.setHours(0,0,0,0);
+      if (selectedStart < todayDate) {
+        toast.error("Leave can only be applied for today or future dates.");
         return;
       }
 
@@ -211,6 +222,7 @@ function Leave() {
                 <input
                   type="date"
                   value={startDate}
+                  min={today}
                   onChange={(e) =>
                     setStartDate(
                       e.target.value
@@ -242,6 +254,7 @@ function Leave() {
                 <input
                   type="date"
                   value={endDate}
+                  min={startDate || today}
                   onChange={(e) =>
                     setEndDate(
                       e.target.value

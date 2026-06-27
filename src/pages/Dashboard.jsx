@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import api from "../services/api";
+import toast from "react-hot-toast";
 
 function Dashboard() {
 
@@ -13,15 +14,44 @@ function Dashboard() {
   const [loading, setLoading] =
     useState(false);
 
+    const [isClockedIn, setIsClockedIn] =
+  useState(false);
+
   const user =
     JSON.parse(
       localStorage.getItem("user")
     );
 
   useEffect(() => {
-    fetchAttendance();
-  }, []);
+  loadDashboard();
+}, []);
 
+const loadDashboard = async () => {
+
+  await Promise.all([
+    fetchAttendance(),
+    fetchAttendanceStatus(),
+  ]);
+
+};
+ const fetchAttendanceStatus = async () => {
+
+  try {
+
+    const res =
+      await api.get("/attendance/status");
+
+    setIsClockedIn(
+      !!res.data.clockedIn
+    );
+
+  } catch (error) {
+
+    console.log(error);
+
+  }
+
+};
   const fetchAttendance =
     async () => {
 
@@ -36,6 +66,14 @@ function Dashboard() {
           res.data.attendance || []
         );
 
+        const attendance = res.data.attendance || [];
+        if(attendance.length>0){
+          const latest=attendance[0];
+          setIsClockedIn(!!latest.clockIn && !latest.clockOut);
+        } else {
+          setIsClockedIn(false);
+        }
+
       } catch (error) {
 
         console.log(error);
@@ -44,69 +82,99 @@ function Dashboard() {
 
     };
 
-  const clockIn = async () => {
+const clockIn = async () => {
 
-    navigator.geolocation.getCurrentPosition(
+  navigator.geolocation.getCurrentPosition(
 
-      async (
-        position
-      ) => {
+    async (position) => {
 
-        try {
+      try {
 
-          await api.post(
-            "/attendance/clock-in",
-            {
-              latitude:
-                position.coords.latitude,
+        setLoading(true);
 
-              longitude:
-                position.coords.longitude
-            }
-          );
+        const res = await api.post(
+          "/attendance/clock-in",
+          {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          }
+        );
 
-          fetchAttendance();
+        setIsClockedIn(true);
 
-        } catch (error) {
+        await loadDashboard();
 
-          alert(
-            error.response?.data?.message ||
-            "Clock In Failed"
-          );
+        toast.success(
+          res.data.message || "Clocked In Successfully"
+        );
+
+        if (res.data.isLate) {
+
+          toast("You have been marked late.", {
+            icon: "⚠️",
+          });
 
         }
 
+      } catch (error) {
+
+        toast.error(
+          error.response?.data?.message ||
+          "Clock In Failed"
+        );
+
+      } finally {
+
+        setLoading(false);
+
       }
 
-    );
+    },
 
-  };
+    () => {
 
-  const clockOut = async () => {
-
-    try {
-
-      setLoading(true);
-
-      await api.post(
-        "/attendance/clock-out"
+      toast.error(
+        "Please allow location access."
       );
-
-      fetchAttendance();
-
-    } catch {
-
-      alert(
-        "Clock Out Failed"
-      );
-
-    } finally {
-
-      setLoading(false);
 
     }
 
-  };
+  );
+
+};
+
+const clockOut = async () => {
+
+  try {
+
+    setLoading(true);
+
+    const res = await api.post(
+      "/attendance/clock-out"
+    );
+
+    setIsClockedIn(false);
+
+    await loadDashboard();
+
+    toast.success(
+      res.data.message || "Clocked Out Successfully"
+    );
+
+  } catch (error) {
+
+    toast.error(
+      error.response?.data?.message ||
+      "Clock Out Failed"
+    );
+
+  } finally {
+
+    setLoading(false);
+
+  }
+
+};
 
   const latest =
     history[0];

@@ -9,76 +9,133 @@ import toast from "react-hot-toast";
 
 function OfficeSettings() {
 
-  const [form, setForm] =
-    useState({
-      name: "",
-      latitude: "",
-      longitude: "",
-      radius: ""
-    });
+  const [loading, setLoading] = useState(false);
+
+  const [form, setForm] = useState({
+
+    name: "",
+
+    latitude: "",
+
+    longitude: "",
+
+    radius: "",
+
+    officeStartTime: "10:00",
+
+    officeEndTime: "19:00",
+
+    graceMinutes: 15,
+
+    fullDayHours: 8,
+
+    halfDayHours: 4,
+
+    workingDays:
+      "Monday,Tuesday,Wednesday,Thursday,Friday",
+
+    timezone:
+      "Asia/Kolkata",
+
+  });
 
   useEffect(() => {
+
     fetchOffice();
+
   }, []);
 
-  const fetchOffice =
-    async () => {
+  const fetchOffice = async () => {
 
-      try {
+    try {
 
-        const res =
-          await api.get(
-            "/admin/office"
-          );
+      const res =
+        await api.get("/admin/office");
 
-        setForm(
-          res.data
-        );
+      setForm(res.data.office);
 
-      } catch (error) {
+    } catch (error) {
 
-        console.log(error);
+      console.error(error);
 
-      }
+      toast.error(
+        "Failed to load office settings."
+      );
 
-    };
+    }
 
-  const handleChange =
-    (e) => {
+  };
 
-      setForm({
-        ...form,
-        [e.target.name]:
-          e.target.value
-      });
+  const handleChange = (e) => {
 
-    };
+    setForm({
 
-  const handleSubmit =
-    async (e) => {
+      ...form,
 
-      e.preventDefault();
+      [e.target.name]:
+        e.target.value,
 
-      try {
+    });
 
-        await api.put(
-          "/admin/office",
-          form
-        );
+  };
 
-        toast.success(
-          "Office Updated"
-        );
+  const handleSubmit = async (e) => {
 
-      } catch {
+    e.preventDefault();
 
-        toast.error(
-          "Update Failed"
-        );
+    if (!form.name.trim()) {
 
-      }
+      return toast.error(
+        "Office name is required."
+      );
 
-    };
+    }
+
+    if (!form.latitude || !form.longitude) {
+
+      return toast.error(
+        "Latitude and Longitude are required."
+      );
+
+    }
+
+    if (!form.radius) {
+
+      return toast.error(
+        "Radius is required."
+      );
+
+    }
+
+    try {
+
+      setLoading(true);
+
+      await api.put(
+        "/admin/office",
+        form
+      );
+
+      toast.success(
+        "Office settings updated successfully."
+      );
+
+    } catch (error) {
+
+      console.error(error);
+
+      toast.error(
+        error.response?.data?.message ||
+        "Failed to update office."
+      );
+
+    } finally {
+
+      setLoading(false);
+
+    }
+
+  };
 
   return (
 
@@ -96,8 +153,7 @@ function OfficeSettings() {
 
           <p className="text-slate-500 dark:text-slate-400 mt-2">
 
-            Configure office geofence
-            and attendance restrictions.
+            Configure attendance rules and office policies.
 
           </p>
 
@@ -107,17 +163,7 @@ function OfficeSettings() {
 
           <form
             onSubmit={handleSubmit}
-            className="
-            bg-white
-            dark:bg-slate-900
-            border
-            border-slate-200
-            dark:border-slate-800
-            rounded-2xl
-            p-8
-            shadow-sm
-            space-y-4
-            "
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-sm space-y-4"
           >
 
             <input
@@ -125,156 +171,229 @@ function OfficeSettings() {
               value={form.name}
               onChange={handleChange}
               placeholder="Office Name"
-              className="
-              w-full
-              h-12
-              px-4
-              border
-              border-slate-300
-              dark:border-slate-700
-              dark:bg-slate-800
-              dark:text-white
-              rounded-xl
-              "
+              className="w-full h-12 px-4 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-xl"
             />
 
-            <input
-              name="latitude"
-              value={form.latitude}
-              onChange={handleChange}
-              placeholder="Latitude"
-              className="
-              w-full
-              h-12
-              px-4
-              border
-              border-slate-300
-              dark:border-slate-700
-              dark:bg-slate-800
-              dark:text-white
-              rounded-xl
-              "
-            />
+            <div className="grid grid-cols-2 gap-4">
 
-            <input
-              name="longitude"
-              value={form.longitude}
-              onChange={handleChange}
-              placeholder="Longitude"
-              className="
-              w-full
-              h-12
-              px-4
-              border
-              border-slate-300
-              dark:border-slate-700
-              dark:bg-slate-800
-              dark:text-white
-              rounded-xl
-              "
-            />
+              <input
+                name="latitude"
+                value={form.latitude}
+                onChange={handleChange}
+                placeholder="Latitude"
+                className="w-full h-12 px-4 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-xl"
+              />
+
+              <input
+                name="longitude"
+                value={form.longitude}
+                onChange={handleChange}
+                placeholder="Longitude"
+                className="w-full h-12 px-4 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-xl"
+              />
+
+            </div>
 
             <input
               name="radius"
               value={form.radius}
               onChange={handleChange}
-              placeholder="Radius (Meters)"
-              className="
-              w-full
-              h-12
-              px-4
-              border
-              border-slate-300
-              dark:border-slate-700
-              dark:bg-slate-800
-              dark:text-white
-              rounded-xl
-              "
+              placeholder="Geofence Radius (meters)"
+              className="w-full h-12 px-4 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-xl"
             />
 
+            <div className="grid grid-cols-2 gap-4">
+
+              <div>
+
+                <label className="block text-sm mb-2 text-slate-600 dark:text-slate-400">
+
+                  Office Start
+
+                </label>
+
+                <input
+                  type="time"
+                  name="officeStartTime"
+                  value={form.officeStartTime}
+                  onChange={handleChange}
+                  className="w-full h-12 px-4 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-xl"
+                />
+
+              </div>
+
+              <div>
+
+                <label className="block text-sm mb-2 text-slate-600 dark:text-slate-400">
+
+                  Office End
+
+                </label>
+
+                <input
+                  type="time"
+                  name="officeEndTime"
+                  value={form.officeEndTime}
+                  onChange={handleChange}
+                  className="w-full h-12 px-4 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-xl"
+                />
+
+              </div>
+
+            </div>
+                        <div className="grid grid-cols-3 gap-4">
+
+              <div>
+
+                <label className="block text-sm mb-2 text-slate-600 dark:text-slate-400">
+                  Grace Minutes
+                </label>
+
+                <input
+                  type="number"
+                  name="graceMinutes"
+                  value={form.graceMinutes}
+                  onChange={handleChange}
+                  className="w-full h-12 px-4 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-xl"
+                />
+
+              </div>
+
+              <div>
+
+                <label className="block text-sm mb-2 text-slate-600 dark:text-slate-400">
+                  Full Day Hours
+                </label>
+
+                <input
+                  type="number"
+                  step="0.5"
+                  name="fullDayHours"
+                  value={form.fullDayHours}
+                  onChange={handleChange}
+                  className="w-full h-12 px-4 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-xl"
+                />
+
+              </div>
+
+              <div>
+
+                <label className="block text-sm mb-2 text-slate-600 dark:text-slate-400">
+                  Half Day Hours
+                </label>
+
+                <input
+                  type="number"
+                  step="0.5"
+                  name="halfDayHours"
+                  value={form.halfDayHours}
+                  onChange={handleChange}
+                  className="w-full h-12 px-4 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-xl"
+                />
+
+              </div>
+
+            </div>
+
+            <div>
+
+              <label className="block text-sm mb-2 text-slate-600 dark:text-slate-400">
+                Working Days
+              </label>
+
+              <input
+                name="workingDays"
+                value={form.workingDays}
+                onChange={handleChange}
+                placeholder="Monday,Tuesday,Wednesday,Thursday,Friday"
+                className="w-full h-12 px-4 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-xl"
+              />
+
+            </div>
+
+            <div>
+
+              <label className="block text-sm mb-2 text-slate-600 dark:text-slate-400">
+                Timezone
+              </label>
+
+              <input
+                name="timezone"
+                value={form.timezone}
+                onChange={handleChange}
+                placeholder="Asia/Kolkata"
+                className="w-full h-12 px-4 border border-slate-300 dark:border-slate-700 dark:bg-slate-800 dark:text-white rounded-xl"
+              />
+
+            </div>
+
             <button
-              className="
-              w-40
-              h-12
-              bg-blue-600
-              hover:bg-blue-700
-              text-white
-              rounded-xl
-              font-semibold
-              "
+              type="submit"
+              disabled={loading}
+              className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-semibold transition"
             >
-              Save Office
+              {loading ? "Saving..." : "Save Office Settings"}
             </button>
 
           </form>
 
-          <div
-            className="
-            bg-white
-            dark:bg-slate-900
-            border
-            border-slate-200
-            dark:border-slate-800
-            rounded-2xl
-            p-8
-            shadow-sm
-            "
-          >
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-sm">
 
-            <h2 className="font-bold text-xl mb-4 text-slate-900 dark:text-white">
-
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">
               Office Summary
-
             </h2>
 
-            <div className="space-y-4">
+            <div className="space-y-4 text-slate-700 dark:text-slate-300">
 
-              <div>
-
-                <p className="text-slate-500 dark:text-slate-400">
-                  Office Name
-                </p>
-
-                <p className="font-semibold text-slate-900 dark:text-white">
-                  {form.name}
-                </p>
-
+              <div className="flex justify-between">
+                <span>Office</span>
+                <span className="font-semibold">{form.name}</span>
               </div>
 
-              <div>
-
-                <p className="text-slate-500 dark:text-slate-400">
-                  Latitude
-                </p>
-
-                <p className="font-semibold text-slate-900 dark:text-white">
-                  {form.latitude}
-                </p>
-
+              <div className="flex justify-between">
+                <span>Location</span>
+                <span>
+                  {form.latitude}, {form.longitude}
+                </span>
               </div>
 
-              <div>
-
-                <p className="text-slate-500 dark:text-slate-400">
-                  Longitude
-                </p>
-
-                <p className="font-semibold text-slate-900 dark:text-white">
-                  {form.longitude}
-                </p>
-
+              <div className="flex justify-between">
+                <span>Radius</span>
+                <span>{form.radius} m</span>
               </div>
 
-              <div>
+              <div className="flex justify-between">
+                <span>Office Hours</span>
+                <span>
+                  {form.officeStartTime} - {form.officeEndTime}
+                </span>
+              </div>
 
-                <p className="text-slate-500 dark:text-slate-400">
-                   Radius
-                </p>
+              <div className="flex justify-between">
+                <span>Grace Period</span>
+                <span>{form.graceMinutes} mins</span>
+              </div>
 
-                <p className="font-semibold text-slate-900 dark:text-white">
-                  {form.radius} meters
-                </p>
+              <div className="flex justify-between">
+                <span>Full Day</span>
+                <span>{form.fullDayHours} hrs</span>
+              </div>
 
+              <div className="flex justify-between">
+                <span>Half Day</span>
+                <span>{form.halfDayHours} hrs</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span>Working Days</span>
+                <span className="text-right max-w-[220px]">
+                  {form.workingDays}
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span>Timezone</span>
+                <span>{form.timezone}</span>
               </div>
 
             </div>

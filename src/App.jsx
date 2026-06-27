@@ -13,25 +13,42 @@ import Profile from "./pages/Profile";
 import Admin from "./pages/Admin";
 import Employees from "./pages/Employees";
 import AddEmployee from "./pages/AddEmployee";
-import AdminRoute from "./components/AdminRoute";
 import OfficeSettings from "./pages/OfficeSettings";
+import Late from "./pages/Late";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminRoute from "./components/AdminRoute";
 
 function App() {
+
   return (
+
     <BrowserRouter>
 
       <Routes>
+
+        {/* =========================
+            Public Routes
+        ========================== */}
 
         <Route
           path="/"
           element={<Login />}
         />
 
-        <Route path="/register" element={<Register />} />
+        <Route
+          path="/register"
+          element={<Register />}
+        />
 
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route
+          path="/forgot-password"
+          element={<ForgotPassword />}
+        />
+
+        {/* =========================
+            Protected Employee Routes
+        ========================== */}
 
         <Route
           path="/dashboard"
@@ -61,71 +78,60 @@ function App() {
         />
 
         <Route
-  path="/admin"
-  element={
-    <ProtectedRoute>
-      <Admin />
-    </ProtectedRoute>
-  }
-/>
+          path="/late"
+          element={
+            <ProtectedRoute>
+              <Late />
+            </ProtectedRoute>
+          }
+        />
 
-<Route
-  path="/employees"
-  element={
-    <ProtectedRoute>
-      <Employees />
-    </ProtectedRoute>
-  }
-/>
+        {/* =========================
+            Admin Routes
+        ========================== */}
 
-<Route
-  path="/add-employee"
-  element={
-    <ProtectedRoute>
-      <AddEmployee />
-    </ProtectedRoute>
-  }
-/>
-<Route
-  path="/admin"
-  element={
-    <AdminRoute>
-      <Admin />
-    </AdminRoute>
-  }
-/>
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <Admin />
+            </AdminRoute>
+          }
+        />
 
-<Route
-  path="/employees"
-  element={
-    <AdminRoute>
-      <Employees />
-    </AdminRoute>
-  }
-/>
+        <Route
+          path="/employees"
+          element={
+            <AdminRoute>
+              <Employees />
+            </AdminRoute>
+          }
+        />
 
-<Route
-  path="/add-employee"
-  element={
-    <AdminRoute>
-      <AddEmployee />
-    </AdminRoute>
-  }
-/>
+        <Route
+          path="/add-employee"
+          element={
+            <AdminRoute>
+              <AddEmployee />
+            </AdminRoute>
+          }
+        />
 
-<Route
-  path="/office"
-  element={
-    <AdminRoute>
-      <OfficeSettings />
-    </AdminRoute>
-  }
-/>
+        <Route
+          path="/office"
+          element={
+            <AdminRoute>
+              <OfficeSettings />
+            </AdminRoute>
+          }
+        />
 
       </Routes>
 
     </BrowserRouter>
+
   );
+
 }
 
 export default App;

@@ -19,7 +19,6 @@ function Register() {
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
-  const [company, setCompany] = useState("");
   const [department, setDepartment] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -59,7 +58,6 @@ function Register() {
       const res = await api.post("/auth/register", {
         firstName,
         lastName,
-        company,
         email,
         department,
         password,
@@ -150,17 +148,6 @@ function Register() {
                   />
                 </div>
               </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">Company (optional)</label>
-                <input
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  placeholder="Your Company"
-                  className="w-full h-12 px-4 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-600 text-slate-900"
-                />
-              </div>
-
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Department</label>
                 <select

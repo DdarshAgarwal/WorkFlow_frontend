@@ -79,7 +79,14 @@ function Login() {
               <p className="text-slate-500">Sign in to manage attendance and teams.</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form
+  onSubmit={handleSubmit}
+  onKeyDown={(e) => {
+    if (e.key === "Enter") {
+      console.log("ENTER DETECTED");
+    }
+  }}
+ className="space-y-5">
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
