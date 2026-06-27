@@ -134,7 +134,7 @@ const clockIn = async () => {
     () => {
 
       toast.error(
-        "Please allow location access."
+         "Please allow location access."
       );
 
     }
