@@ -1,29 +1,42 @@
 import {
+  Suspense,
+  lazy,
+} from "react";
+
+import {
   BrowserRouter,
   Routes,
   Route,
 } from "react-router-dom";
 
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import ForgotPassword from "./pages/ForgotPassword";
-import Dashboard from "./pages/Dashboard";
-import Leave from "./pages/Leave";
-import Profile from "./pages/Profile";
-import Admin from "./pages/Admin";
-import Employees from "./pages/Employees";
-import AddEmployee from "./pages/AddEmployee";
-import OfficeSettings from "./pages/OfficeSettings";
-import Late from "./pages/Late";
-
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
+
+const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Leave = lazy(() => import("./pages/Leave"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Admin = lazy(() => import("./pages/Admin"));
+const Employees = lazy(() => import("./pages/Employees"));
+const AddEmployee = lazy(() => import("./pages/AddEmployee"));
+const OfficeSettings = lazy(() => import("./pages/OfficeSettings"));
+const Late = lazy(() => import("./pages/Late"));
 
 function App() {
 
   return (
 
     <BrowserRouter>
+
+      <Suspense
+        fallback={
+          <div className="min-h-screen grid place-items-center bg-slate-50 text-slate-700">
+            Loading...
+          </div>
+        }
+      >
 
       <Routes>
 
@@ -127,6 +140,8 @@ function App() {
         />
 
       </Routes>
+
+      </Suspense>
 
     </BrowserRouter>
 

@@ -1,8 +1,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import api from "../services/api";
-import { Link } from "react-router-dom";
-import logo from "../assets/logo.svg";
+import { Link, useNavigate } from "react-router-dom";
 
 const SECURITY_QUESTIONS = [
   "What is your mother's maiden name?",
@@ -16,6 +15,8 @@ const SECURITY_QUESTIONS = [
 ];
 
 function Register() {
+
+  const navigate = useNavigate();
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -71,7 +72,7 @@ function Register() {
       toast.success("Registration successful");
 
       setTimeout(() => {
-        window.location.href = "/dashboard";
+        navigate("/dashboard");
       }, 800);
 
     } catch (error) {
@@ -83,40 +84,7 @@ function Register() {
   return (
     <div className="min-h-screen flex bg-gradient-to-br from-indigo-100 via-blue-50 to-cyan-100 lg:bg-white">
 
-      {/* LEFT - HIDDEN ON MOBILE; fixed on desktop so it doesn't scroll */}
-      <div className="hidden lg:flex lg:fixed lg:inset-y-0 lg:left-0 lg:w-1/2 bg-slate-900 text-white lg:overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-700 via-indigo-700 to-slate-900" />
-
-        <div className="relative z-10 flex flex-col justify-center px-20 h-full">
-          <div className="mb-12 flex items-center gap-4">
-            <div className="w-20 h-20 lg:w-28 lg:h-28 rounded-3xl overflow-hidden shadow-2xl ring-1 ring-white/20">
-              <img src={logo} alt="WORKFLOW" className="w-full h-full" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-white leading-tight">WORKFLOW</h1>
-              <p className="text-slate-200 text-sm mt-1 max-w-lg">Streamline Attendance. Empower Productivity.</p>
-            </div>
-          </div>
-
-          <div className="mt-12 flex gap-8">
-            <div>
-              <h3 className="text-4xl font-bold">99.9%</h3>
-              <p className="text-slate-400">Uptime</p>
-            </div>
-            <div>
-              <h3 className="text-4xl font-bold">100m</h3>
-              <p className="text-slate-400">Geofence</p>
-            </div>
-            <div>
-              <h3 className="text-4xl font-bold">24/7</h3>
-              <p className="text-slate-400">Access</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* RIGHT */}
-      <div className="flex-1 flex items-center justify-center px-6 py-12 overflow-y-auto lg:ml-[50%]">
+      <div className="flex-1 flex items-center justify-center px-6 py-12 overflow-y-auto">
         <div className="w-full max-w-md">
           <div className="relative bg-white rounded-3xl shadow-2xl p-8 lg:bg-transparent lg:shadow-none lg:p-0">
 
@@ -229,7 +197,7 @@ function Register() {
                 </div>
               </div>
 
-              <button className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition mt-6">
+              <button type="submit" className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition mt-6">
                 Create account
               </button>
 

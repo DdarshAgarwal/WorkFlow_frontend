@@ -29,37 +29,73 @@ function Leave() {
     setLeaves] =
     useState([]);
 
+  const [leaveSummary,
+    setLeaveSummary] =
+    useState(null);
+
   const [loading,
     setLoading] =
     useState(false);
 
+  const tomorrowDate = new Date();
+  tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+  const tomorrow = tomorrowDate.toISOString().split("T")[0];
+
+  async function fetchLeaves() {
+
+    try {
+
+      const res =
+        await api.get(
+          "/leave/my-leaves"
+        );
+
+      setLeaves(
+        res.data.leaves || []
+      );
+
+      setLeaveSummary(
+        res.data.leaveSummary || null
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  }
+
   useEffect(() => {
-    fetchLeaves();
-  }, []);
+    let active = true;
 
-  const today = new Date().toISOString().split("T")[0];
-
-  const fetchLeaves =
-    async () => {
-
+    async function loadLeaves() {
       try {
-
         const res =
           await api.get(
             "/leave/my-leaves"
           );
 
+        if (!active) return;
+
         setLeaves(
           res.data.leaves || []
         );
 
+        setLeaveSummary(
+          res.data.leaveSummary || null
+        );
       } catch (error) {
-
         console.log(error);
-
       }
+    }
 
+    loadLeaves();
+
+    return () => {
+      active = false;
     };
+  }, []);
 
   const handleSubmit =
     async (e) => {
@@ -81,12 +117,13 @@ function Leave() {
         return;
       }
 
-      const todayDate = new Date();
-      todayDate.setHours(0,0,0,0);
+      const tomorrowDate = new Date();
+      tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+      tomorrowDate.setHours(0,0,0,0);
       const selectedStart = new Date(startDate);
       selectedStart.setHours(0,0,0,0);
-      if (selectedStart < todayDate) {
-        toast.error("Leave can only be applied for today or future dates.");
+      if (selectedStart < tomorrowDate) {
+        toast.error("Leave can only be applied for future dates.");
         return;
       }
 
@@ -106,7 +143,7 @@ function Leave() {
 
         setLoading(true);
 
-        await api.post(
+        const res = await api.post(
           "/leave/apply",
           {
             leaveType,
@@ -117,8 +154,15 @@ function Leave() {
         );
 
         toast.success(
-          "Leave Applied Successfully"
+          res.data.message || "Leave Applied Successfully"
         );
+
+        if (res.data.leaveSummary) {
+          setLeaveSummary(res.data.leaveSummary);
+          toast(
+            `${res.data.leaveSummary.remainingLeaveDays} annual leave days remaining.`
+          );
+        }
 
         setLeaveType(
           "Casual Leave"
@@ -168,6 +212,38 @@ function Leave() {
           </p>
 
         </div>
+
+        {leaveSummary && (
+          <div className="grid md:grid-cols-4 gap-4 mx-4 sm:mx-6 md:mx-0">
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+              <p className="text-sm text-slate-500 dark:text-slate-400">Annual Allowance</p>
+              <h2 className="text-3xl font-bold mt-2 text-slate-900 dark:text-white">
+                {leaveSummary.annualAllowance}
+              </h2>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+              <p className="text-sm text-slate-500 dark:text-slate-400">Leaves Reserved</p>
+              <h2 className="text-3xl font-bold mt-2 text-slate-900 dark:text-white">
+                {leaveSummary.usedLeaveDays}
+              </h2>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+              <p className="text-sm text-slate-500 dark:text-slate-400">Late Deductions</p>
+              <h2 className="text-3xl font-bold mt-2 text-slate-900 dark:text-white">
+                {leaveSummary.lateLeaveDeductions}
+              </h2>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm">
+              <p className="text-sm text-slate-500 dark:text-slate-400">Remaining</p>
+              <h2 className="text-3xl font-bold mt-2 text-blue-600">
+                {leaveSummary.remainingLeaveDays}
+              </h2>
+            </div>
+          </div>
+        )}
 
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 shadow-sm mx-4 sm:mx-6 md:mx-0">
 
@@ -222,7 +298,7 @@ function Leave() {
                 <input
                   type="date"
                   value={startDate}
-                  min={today}
+                  min={tomorrow}
                   onChange={(e) =>
                     setStartDate(
                       e.target.value
@@ -254,7 +330,7 @@ function Leave() {
                 <input
                   type="date"
                   value={endDate}
-                  min={startDate || today}
+                  min={startDate || tomorrow}
                   onChange={(e) =>
                     setEndDate(
                       e.target.value

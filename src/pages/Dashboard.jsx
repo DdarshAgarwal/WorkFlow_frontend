@@ -14,83 +14,109 @@ function Dashboard() {
   const [loading, setLoading] =
     useState(false);
 
-    const [isClockedIn, setIsClockedIn] =
-  useState(false);
+  const [isClockedIn, setIsClockedIn] =
+    useState(false);
 
   const user =
     JSON.parse(
       localStorage.getItem("user")
     );
 
-  useEffect(() => {
-  loadDashboard();
-}, []);
+  async function loadDashboard() {
 
-const loadDashboard = async () => {
-
-  await Promise.all([
-    fetchAttendance(),
-    fetchAttendanceStatus(),
-  ]);
-
-};
- const fetchAttendanceStatus = async () => {
-
-  try {
-
-    const res =
-      await api.get("/attendance/status");
-
-    setIsClockedIn(
-      !!res.data.clockedIn
-    );
-
-  } catch (error) {
-
-    console.log(error);
+    await Promise.all([
+      fetchAttendance(),
+      fetchAttendanceStatus(),
+    ]);
 
   }
 
-};
-  const fetchAttendance =
-    async () => {
+  async function fetchAttendanceStatus() {
 
-      try {
+    try {
 
-        const res =
-          await api.get(
-            "/attendance/history"
-          );
+      const res =
+        await api.get("/attendance/status");
 
-        setHistory(
-          res.data.attendance || []
+      setIsClockedIn(
+        !!res.data.clockedIn
+      );
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  }
+
+  async function fetchAttendance() {
+
+    try {
+
+      const res =
+        await api.get(
+          "/attendance/history"
         );
 
-        const attendance = res.data.attendance || [];
-        if(attendance.length>0){
-          const latest=attendance[0];
-          setIsClockedIn(!!latest.clockIn && !latest.clockOut);
-        } else {
-          setIsClockedIn(false);
-        }
+      setHistory(
+        res.data.attendance || []
+      );
 
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+  }
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadInitialDashboard() {
+      try {
+        const [attendanceRes, statusRes] = await Promise.all([
+          api.get("/attendance/history"),
+          api.get("/attendance/status"),
+        ]);
+
+        if (!active) return;
+
+        setHistory(
+          attendanceRes.data.attendance || []
+        );
+
+        setIsClockedIn(
+          !!statusRes.data.clockedIn
+        );
       } catch (error) {
-
         console.log(error);
-
       }
+    }
 
+    loadInitialDashboard();
+
+    return () => {
+      active = false;
     };
+  }, []);
 
 const clockIn = async () => {
+
+  setLoading(true);
+
+  if (!navigator.geolocation) {
+    toast.error("Location is not supported by this browser.");
+    setLoading(false);
+    return;
+  }
 
   navigator.geolocation.getCurrentPosition(
 
     async (position) => {
 
       try {
-
-        setLoading(true);
 
         const res = await api.post(
           "/attendance/clock-in",
@@ -110,8 +136,8 @@ const clockIn = async () => {
 
         if (res.data.isLate) {
 
-          toast("You have been marked late.", {
-            icon: "⚠️",
+          toast("You have been marked late. Three late days count as one leave.", {
+            icon: "!",
           });
 
         }
@@ -134,8 +160,10 @@ const clockIn = async () => {
     () => {
 
       toast.error(
-         "Please allow location access."
+        "Please allow location access."
       );
+
+      setLoading(false);
 
     }
 
@@ -376,21 +404,23 @@ const clockOut = async () => {
 
           <div className="flex gap-4 flex-wrap">
 
-            <button
-              onClick={clockIn}
-              disabled={loading}
-              className="w-40 h-12 bg-green-600 hover:bg-green-700 text-white rounded-xl font-semibold"
-            >
-              Clock In
-            </button>
-
-            <button
-              onClick={clockOut}
-              disabled={loading}
-              className="w-40 h-12 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold"
-            >
-              Clock Out
-            </button>
+            {isClockedIn ? (
+              <button
+                onClick={clockOut}
+                disabled={loading}
+                className="w-40 h-12 bg-red-600 hover:bg-red-700 disabled:opacity-60 text-white rounded-xl font-semibold"
+              >
+                {loading ? "Please wait..." : "Clock Out"}
+              </button>
+            ) : (
+              <button
+                onClick={clockIn}
+                disabled={loading}
+                className="w-40 h-12 bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white rounded-xl font-semibold"
+              >
+                {loading ? "Please wait..." : "Clock In"}
+              </button>
+            )}
 
             <button
               onClick={() =>

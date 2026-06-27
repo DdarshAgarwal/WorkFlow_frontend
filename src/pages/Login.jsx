@@ -1,9 +1,12 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import api from "../services/api";
 import logo from "../assets/logo.svg";
 
 function Login() {
+
+  const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,7 +27,7 @@ function Login() {
       toast.success("Login Successful");
 
       setTimeout(() => {
-        window.location.href = "/dashboard";
+        navigate("/dashboard");
       }, 1000);
 
     } catch (error) {
@@ -79,14 +82,7 @@ function Login() {
               <p className="text-slate-500">Sign in to manage attendance and teams.</p>
             </div>
 
-            <form
-  onSubmit={handleSubmit}
-  onKeyDown={(e) => {
-    if (e.key === "Enter") {
-      console.log("ENTER DETECTED");
-    }
-  }}
- className="space-y-5">
+            <form onSubmit={handleSubmit} className="space-y-5">
 
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-2">Email Address</label>
@@ -110,7 +106,7 @@ function Login() {
                 />
               </div>
 
-              <button className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition mt-6">
+              <button type="submit" className="w-full h-12 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-semibold transition mt-6">
                 Sign In
               </button>
 

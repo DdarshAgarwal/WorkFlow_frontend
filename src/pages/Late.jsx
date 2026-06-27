@@ -8,20 +8,31 @@ function Late() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchLateHistory();
-  }, []);
+    let active = true;
 
-  const fetchLateHistory = async () => {
-    try {
-      const res = await api.get("/attendance/late-history");
-      setLateHistory(res.data.lateHistory || []);
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to load late history.");
-    } finally {
-      setLoading(false);
+    async function loadLateHistory() {
+      try {
+        const res = await api.get("/attendance/late-history");
+
+        if (!active) return;
+
+        setLateHistory(res.data.lateHistory || []);
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load late history.");
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
     }
-  };
+
+    loadLateHistory();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const totalLate = lateHistory.length;
   const deductedLeaves = Math.floor(totalLate / 3);

@@ -24,7 +24,9 @@ function ForgotPassword() {
 
     try {
       setLoading(true);
-      const res = await api.get(`/auth/security-questions?email=${email}`);
+      const res = await api.get(
+        `/auth/security-questions?email=${encodeURIComponent(email)}`
+      );
       setSecurityQuestions(res.data.questions);
       setStep(2);
       toast.success("Please answer your security questions");
@@ -77,7 +79,8 @@ function ForgotPassword() {
       setLoading(true);
       const res = await api.post("/auth/forgot-password", {
         email,
-        newPassword
+        newPassword,
+        answers: securityQuestions.map(q => answers[q.question] || "")
       });
 
       toast.success(res.data.message || "Password reset successfully");
