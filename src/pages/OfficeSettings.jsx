@@ -7,37 +7,81 @@ import Layout from "../components/Layout";
 import api from "../services/api";
 import toast from "react-hot-toast";
 
+const DEFAULT_OFFICE = {
+  name: "",
+  latitude: "",
+  longitude: "",
+  radius: 100,
+  officeStartTime: "10:00",
+  officeEndTime: "19:00",
+  graceMinutes: 15,
+  fullDayHours: 8,
+  halfDayHours: 4,
+  workingDays:
+    "Monday,Tuesday,Wednesday,Thursday,Friday",
+  timezone:
+    "Asia/Kolkata",
+};
+
+const toTimeInputValue = (value, fallback) => {
+  if (!value) return fallback;
+
+  const normalized =
+    String(value)
+      .trim()
+      .replace(/\s+/g, "")
+      .toUpperCase();
+
+  const meridiemMatch =
+    normalized.match(/^(\d{1,2}):(\d{2})(AM|PM)$/);
+
+  if (meridiemMatch) {
+    let hours = Number(meridiemMatch[1]);
+    const minutes = meridiemMatch[2];
+    const meridiem = meridiemMatch[3];
+
+    if (meridiem === "PM" && hours < 12) hours += 12;
+    if (meridiem === "AM" && hours === 12) hours = 0;
+
+    return `${String(hours).padStart(2, "0")}:${minutes}`;
+  }
+
+  const timeMatch =
+    normalized.match(/^(\d{1,2}):(\d{2})$/);
+
+  if (!timeMatch) return fallback;
+
+  return `${String(Number(timeMatch[1])).padStart(2, "0")}:${timeMatch[2]}`;
+};
+
+const normalizeOffice = (office = {}) => ({
+  ...DEFAULT_OFFICE,
+  ...office,
+  officeStartTime: toTimeInputValue(
+    office.officeStartTime,
+    DEFAULT_OFFICE.officeStartTime
+  ),
+  officeEndTime: toTimeInputValue(
+    office.officeEndTime,
+    DEFAULT_OFFICE.officeEndTime
+  ),
+  graceMinutes:
+    office.graceMinutes ?? DEFAULT_OFFICE.graceMinutes,
+  fullDayHours:
+    office.fullDayHours ?? DEFAULT_OFFICE.fullDayHours,
+  halfDayHours:
+    office.halfDayHours ?? DEFAULT_OFFICE.halfDayHours,
+  workingDays:
+    office.workingDays || DEFAULT_OFFICE.workingDays,
+  timezone:
+    office.timezone || DEFAULT_OFFICE.timezone,
+});
+
 function OfficeSettings() {
 
   const [loading, setLoading] = useState(false);
 
-  const [form, setForm] = useState({
-
-    name: "",
-
-    latitude: "",
-
-    longitude: "",
-
-    radius: "",
-
-    officeStartTime: "10:00",
-
-    officeEndTime: "19:00",
-
-    graceMinutes: 15,
-
-    fullDayHours: 8,
-
-    halfDayHours: 4,
-
-    workingDays:
-      "Monday,Tuesday,Wednesday,Thursday,Friday",
-
-    timezone:
-      "Asia/Kolkata",
-
-  });
+  const [form, setForm] = useState(DEFAULT_OFFICE);
 
   useEffect(() => {
 
@@ -52,7 +96,7 @@ function OfficeSettings() {
       const res =
         await api.get("/admin/office");
 
-      setForm(res.data.office);
+      setForm(normalizeOffice(res.data.office));
 
     } catch (error) {
 
@@ -111,10 +155,14 @@ function OfficeSettings() {
 
       setLoading(true);
 
+      const payload = normalizeOffice(form);
+
       await api.put(
         "/admin/office",
-        form
+        payload
       );
+
+      setForm(payload);
 
       toast.success(
         "Office settings updated successfully."
